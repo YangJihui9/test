@@ -5,6 +5,8 @@ using namespace std;
 int minCostConnectPoints(vector<vector<int>> &points) {
   vector<vector<int>> edges;
   int len = points.size();
+  edges.reserve(len * (len - 1) / 2);
+
   for (int i = 0; i < len; i++) {
     for (int j = i + 1; j < len; ++j) {
       int dist = (points[i][0] - points[j][0]) * (points[i][0] - points[j][0]) +
