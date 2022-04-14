@@ -102,6 +102,7 @@ int minCostConnect(vector<vector<int>> &points) {
   vector<EdgeT> aEdge = move(graph[0]);
   while (count < len) {
     EdgeT &now = aEdge[0];
+    conn[now.first] = true;
     cost += now.second;
     count++;
     if (count == len) {
