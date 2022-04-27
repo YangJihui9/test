@@ -2,52 +2,53 @@
 #include <vector>
 using namespace std;
 
-
 class Solution {
 public:
-    int minCostConnectPoints(vector<vector<int>>& points) {
-        int n = points.size();
-        
-        // Min-heap to store minimum weight edge at top.
-        priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> heap;
-        
-        // Track nodes which are included in MST.
-        vector<bool> inMST(n);
-        
-        heap.push({ 0, 0 });
-        int mstCost = 0;
-        int edgesUsed = 0;
-        
-        while (edgesUsed < n) {
-            pair<int, int> topElement = heap.top();
-            heap.pop();
-            
-            int weight = topElement.first;
-            int currNode = topElement.second;
-            
-            // If node was already included in MST we will discard this edge.
-            if (inMST[currNode]) {
-                continue;
-            }
-            
-            inMST[currNode] = true;
-            mstCost += weight;
-            edgesUsed++;
-            
-            for (int nextNode = 0; nextNode < n; ++nextNode) {
-                // If next node is not in MST, then edge from curr node
-                // to next node can be pushed in the priority queue.
-                if (!inMST[nextNode]) {
-                    int nextWeight = abs(points[currNode][0] - points[nextNode][0]) + 
-                                     abs(points[currNode][1] - points[nextNode][1]);
-                    
-                    heap.push({ nextWeight, nextNode });
-                }
-            }
+  int minCostConnectPoints(vector<vector<int>> &points) {
+    int n = points.size();
+
+    // Min-heap to store minimum weight edge at top.
+    priority_queue<pair<int, int>, vector<pair<int, int>>,
+                   greater<pair<int, int>>>
+        heap;
+
+    // Track nodes which are included in MST.
+    vector<bool> inMST(n);
+
+    heap.push({0, 0});
+    int mstCost = 0;
+    int edgesUsed = 0;
+
+    while (edgesUsed < n) {
+      pair<int, int> topElement = heap.top();
+      heap.pop();
+
+      int weight = topElement.first;
+      int currNode = topElement.second;
+
+      // If node was already included in MST we will discard this edge.
+      if (inMST[currNode]) {
+        continue;
+      }
+
+      inMST[currNode] = true;
+      mstCost += weight;
+      edgesUsed++;
+
+      for (int nextNode = 0; nextNode < n; ++nextNode) {
+        // If next node is not in MST, then edge from curr node
+        // to next node can be pushed in the priority queue.
+        if (!inMST[nextNode]) {
+          int nextWeight = abs(points[currNode][0] - points[nextNode][0]) +
+                           abs(points[currNode][1] - points[nextNode][1]);
+
+          heap.push({nextWeight, nextNode});
         }
-        
-        return mstCost;
+      }
     }
+
+    return mstCost;
+  }
 };
 
 int minCostConnectPoints(vector<vector<int>> &points) {
@@ -202,4 +203,55 @@ int minCostConnect(vector<vector<int>> &points) {
   }
 
   return cost;
+}
+
+class Solution {
+public
+  int findCheapestPrice(int n, int[][] flights, int src, int dst, int K) {
+    // Build the adjacency matrix
+    int adjMatrix[][] = new int[n][n];
+    for (int[] flight : flights) {
+      adjMatrix[flight[0]][flight[1]] = flight[2];
+    }
+    // Shortest distances array
+    int[] distances = new int[n];
+    // Shortest steps array
+    int[] currentStops = new int[n];
+    Arrays.fill(distances, Integer.MAX_VALUE);
+    Arrays.fill(currentStops, Integer.MAX_VALUE);
+    distances[src] = 0;
+    currentStops[src] = 0;
+    // The priority queue would contain (node, cost, stops)
+    PriorityQueue<int[]> minHeap =
+        new PriorityQueue<int[]>((a, b)->a[1] - b[1]);
+    minHeap.offer(new int[]{src, 0, 0});
+    while (!minHeap.isEmpty()) {
+      int[] info = minHeap.poll();
+      int node = info[0], stops = info[2], cost = info[1];
+      // If destination is reached, return the cost to get here
+      if (node == dst) {
+        return cost;
+      }
+      // If there are no more steps left, continue
+      if (stops == K + 1) {
+        continue;
+      }
+      // Examine and relax all neighboring edges if possible
+      for (int nei = 0; nei < n; nei++) {
+        if (adjMatrix[node][nei] > 0) {
+          int dU = cost, dV = distances[nei], wUV = adjMatrix[node][nei];
+          // Better cost?
+          if (dU + wUV < dV) {
+            minHeap.offer(new int[]{nei, dU + wUV, stops + 1});
+            distances[nei] = dU + wUV;
+          } else if (stops < currentStops[nei]) {
+            // Better steps?
+            minHeap.offer(new int[]{nei, dU + wUV, stops + 1});
+          }
+          currentStops[nei] = stops;
+        }
+      }
+    }
+    return distances[dst] == Integer.MAX_VALUE ? -1 : distances[dst];
+  }
 }
