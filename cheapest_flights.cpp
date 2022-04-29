@@ -1,34 +1,41 @@
+#include <climits>
+#include <vector>
+using namespace std;
+
 class Solution {
 public:
   vector<vector<int>> memo;
-  vector<vector<int>> g;
-  int dst;
-  int inf = 1e6;
-
+  vector<vector<int>> dist;
+  int gdst;
   int findCheapestPrice(int n, vector<vector<int>> &flights, int src, int dst,
                         int k) {
-    n += 10;
-    memo.resize(n, vector<int>(n, -1));
-    g.resize(n, vector<int>(n));
-    for (auto &e : flights)
-      g[e[0]][e[1]] = e[2];
-    this->dst = dst;
-    int ans = dfs(src, k + 1);
-    return ans >= inf ? -1 : ans;
-  }
+    dist.resize(n, vector<int>(n, -1));
+    memo.resize(n, vector<int>(k + 2, -1));
+    for (auto flight : flights) {
+      dist[flight[0]][flight[1]] = flight[2];
+    }
 
-  int dfs(int u, int k) {
-    if (memo[u][k] != -1)
-      return memo[u][k];
-    if (u == dst)
+    gdst = dst;
+    int price = findCheap(src, k);
+    return price < INT_MAX ? price : -1;
+  }
+  int findCheap(int src, int k) {
+    if (memo[src][k] != -1) {
+      return memo[src][k];
+    }
+    if (src == gdst) {
       return 0;
-    if (k <= 0)
-      return inf;
-    int ans = inf;
-    for (int v = 0; v < g[u].size(); ++v)
-      if (g[u][v] > 0)
-        ans = min(ans, dfs(v, k - 1) + g[u][v]);
-    memo[u][k] = ans;
-    return memo[u][k];
+    }
+    if (k < 0) {
+      return INT_MAX;
+    }
+    int price = INT_MAX;
+    for (int i = 0; i < dist.size(); ++i) {
+      if (dist[src][i] != -1) {
+        price = min(price, dist[src][i] + findCheap(i, k - 1));
+      }
+    }
+    memo[src][k] = price;
+    return price;
   }
 };
