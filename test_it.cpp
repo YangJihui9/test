@@ -10,8 +10,9 @@ int gdst;
 int inf = 1000;
 
 int findCheap(int src, int k) {
+  cout << "source: " << src << ", stops: " << k << endl;
   if (k < 0) {
-    cout << "src: " << src << ", k:" << k << ", price: " << inf << endl;
+    cout << "k < 0 src: " << src << ", k:" << k << ", price: " << inf << endl;
     return inf;
   }
   if (memo[src][k] != -1) {
@@ -19,18 +20,21 @@ int findCheap(int src, int k) {
     return memo[src][k];
   }
   if (src == gdst) {
-    cout << "src: " << src << ", k:" << k << ", price: " << 0 << endl;
+    cout << "dst src: " << src << ", k:" << k << ", price: " << 0 << endl;
     return 0;
   }
 
   int price = inf;
+  if (dist[src][gdst] != -1) {
+    price = dist[src][gdst];
+  }
 
   for (int i = 0; i < dist.size(); ++i) {
     if (dist[src][i] != -1) {
       price = min(price, dist[src][i] + findCheap(i, k - 1));
     }
   }
-  cout << "src: " << src << ", k:" << k << ", price: " << price << endl;
+  cout << "result src: " << src << ", k:" << k << ", price: " << price << endl;
   memo[src][k] = price;
   return price;
 }
